@@ -68,7 +68,6 @@ function getMove(player, board) {
 		}
 	}
 
-	// console.log(`1ADJ: ${JSON.stringify(allAdjacents)}`);
 	filterAdjacentSpaces( allAdjacents, 0, openAdjacents );
 
 	// checks spaces along the vector of ( potentialMove -> opponentPiece ) for flanks and tracks how many pieces would be captured
@@ -87,9 +86,7 @@ function getMove(player, board) {
 			let opponentAdjacents = []
 			const [ targetX, targetY ] = move.move;
 			const secondaryAdjacents = [getAllAdjacentSpaces(targetX, targetY, head)];
-			console.log(`SECONDARY ADJACENTS!!! ${JSON.stringify(secondaryAdjacents)}`)
 			filterAdjacentSpaces( secondaryAdjacents, opponent, opponentAdjacents )
-			console.log(`OPPONENT ADJACENTS!!! ${JSON.stringify(opponentAdjacents)}`)
 
 			// if there is at least one additional opponent adjacent to the current move, find all potential captured pieces from other vectors
 			if ( opponentAdjacents.length ) {
@@ -100,7 +97,6 @@ function getMove(player, board) {
 						const secondaryTail = opponentAdjacents[i].target;
 						const secondaryMove = checkMove( secondaryHead, secondaryTail, board, player, opponent );
 						if (secondaryMove.isMove) {
-							console.log(`MULTIDIRECTIONAL CAPTURE!!!  ${secondaryMove.move}`)
 							move.captured.push(secondaryMove.captured[0])
 						}
 					}
@@ -121,9 +117,6 @@ function getMove(player, board) {
 		}
 	}
 
-	console.log('POSSIBLE MOVES')
-	console.log(possibleMoves)
-
 	if ( possibleMoves.length === 0 ) {
 		console.log('No more valid moves');
 		return;
@@ -136,10 +129,6 @@ function getMove(player, board) {
 			mostCaptured = totalCaptured;
 		}
 	}
-
-	console.log(`MOST CAPTURED: ${mostCaptured}`)
-	console.log('POSSIBLES:')
-	console.log(possibleMoves)
 
 	// refine list of possible moves to those that capture most pieces or secure an edge or corner
 	const reducedPossibleMoves = possibleMoves.map( move => [ move[0], reduceCaptured(move[1]) ] )
@@ -164,7 +153,6 @@ function getMove(player, board) {
 	if ( bestMoves.length === 1 ) {
 		const totalCaptured = reduceCaptured(bestMoves[0][1]);
 		move = bestMoves[0][0];
-		console.log (`move: ${move}  captured: ${totalCaptured}`)
 		return move;
 
 	} else {
@@ -175,10 +163,6 @@ function getMove(player, board) {
 		const traverseMoves = [];
 		const edgeMoves = [];
 		const reducedBestMoves = bestMoves.map( move => [ move[0], reduceCaptured(move[1]) ] )
-		console.log(`BEST: `);
-		console.log(bestMoves);
-		console.log(`REDUCED BEST:`);
-		console.log(reducedBestMoves);
 
 		for ( let i = 0 ; i < bestMoves.length ; i++ ) {
 			const id = bestMoves[i][0].join('');
@@ -202,14 +186,11 @@ function getMove(player, board) {
 		// move hierarchy
 		// reduce captured arrays in cornerMoves and sort by most pieces captured
 		if (cornerMoves.length) {
-			console.log(`CORNER UNREDUCED: ${cornerMoves}`)
 			const reducedCorners = cornerMoves.map( move => [ move[0], reduceCaptured(move[1]) ] )
-			console.log(`CORNER REDUCED: ${reducedCorners}`)
 			const descendingCorners = reducedCorners.sort((a,b) => {
 				return b[1] - a[1];
 			})
 			move = descendingCorners[0][0];
-			console.log (`move: ${move}  captured: ${descendingCorners[0][1]}`)
 			return move;
 		}
 
@@ -224,13 +205,11 @@ function getMove(player, board) {
 				const traverseId = descendingTraverses[i][0].join('')
 				if ( isEdge(traverseId) ) {
 					move = descendingTraverses[i][0];
-					console.log (`move: ${move}  captured: ${descendingTraverses[i][1]}`)
 					return move;
 				}
 			}
 
 			move = descendingTraverses[0][0];
-			console.log (`move: ${move}  captured: ${descendingTraverses[0][1]}`)
 			return move;
 		}
 
@@ -241,7 +220,6 @@ function getMove(player, board) {
 				return b[1] - a[1];
 			})
 			move = descendingEdges[0][0];
-			console.log (`move: ${move}  captured: ${descendingEdges[0][1]}`)
 			return move;
 		}
 
@@ -250,7 +228,6 @@ function getMove(player, board) {
 		const mostCapturedArr = reducedBestMoves.filter( move => move[1] === mostCaptured);
 		const randomIndex = Math.floor(Math.random() * mostCapturedArr.length);
 		move = mostCapturedArr[randomIndex][0];
-		console.log (`move: ${move}  captured: ${mostCaptured}`)
 		return move;
 	}
 }
